@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="recursos/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="index.js" defer></script>
+    <title>Otro creador de tareas</title>
+  </head>
+
+  <body>
+    <section class="p-4 text-white">
+      <nav>
+        <ul>
+
+          <!--
+          Logica mas adelante. Pereza. -->
+
+          <div class="hidden items-end justify-end text-right">
+            <>
+              Status: <span id="status">Loading...</span>
+              </p>
+          </div>
+          <a href="/">
+            <p id="test" class="text-2xl font-bold :">
+              Task-To-Do</p>
+          </a>
+        </ul>
+      </nav>
+    </section>
+
+    <div class="max-w-3xl mx-auto px-2 text-white">
+      <section class="pt-8 md:pt-16">
+        <div>
+          <div class="text-white grid sm:grid-cols-2 gap-2">
+            <p class="text-4xl font-bold leading-tight"><strong>Empower Yourself, Impact the World</strong></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="pt-16 space-y-4">
+        <div class="flex">
+        </div>
+        <div>
+          <div class="pb-4">
+            <input id="newTask" type="text" placeholder="Sacar el perro a paear"
+              class="pt-4flex cursor-text w-full justify-between items-center p-4 bg-white rounded-lg shadow-md dark:bg-gray-800  focus:outline-none">
+          </div>
+          <H1 id="noTask" class="text-center text-2xl p-12 font-semibold">Nada que hacer por el momento ...</H1>
+          <div class="grid gap-2" id="taskList">
+          </div>
+      </section>
+    </div>
+  </body>
+
+</html>
