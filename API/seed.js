@@ -1,14 +1,14 @@
-import { PrismaClient } from '@prisma/client'
+import {PrismaClient} from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 // Sembrame esta xd.
 
 const users = [
-  { name: 'Juan' },
-  { name: 'María' },
-  { name: 'Pedro' },
-]
+  {name: 'Juan'},
+  {name: 'María'},
+  {name: 'Pedro'},
+];
 
 const tasks = [
   {
@@ -29,7 +29,7 @@ const tasks = [
     done: false,
     userId: 3,
   },
-]
+];
 
 const tasksC = await prisma.task.create({
   data: {
@@ -37,7 +37,7 @@ const tasksC = await prisma.task.create({
     content: 'Descripción de la tarea 3',
     done: false,
     userId: 3,
-  }
-})
+  },
+});
 
 

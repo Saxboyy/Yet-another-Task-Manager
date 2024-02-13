@@ -1,30 +1,45 @@
-
 const newTask = document.getElementById('newTask')
+const descriptionInput = document.getElementById('description')
+const dueDateInput = document.getElementById('dueDate')
+const newTaskLabel = document.getElementById('newTaskLabel')
+const descriptionLabel = document.getElementById('descriptionLabel')
+const dueDateLabel = document.getElementById('dueDateLabel')
+
+newTask.addEventListener('click', () => {
+  descriptionInput.classList.remove('hidden')
+  dueDateInput.classList.remove('hidden')
+  newTaskLabel.classList.remove('hidden')
+  descriptionLabel.classList.remove('hidden')
+  dueDateLabel.classList.remove('hidden')
+})
 
 newTask.addEventListener('keypress', (event) => {
   if (event.key === "Enter") {
-    event.preventDefault();
-    saveTask(newTask.value)
+    event.preventDefault()
+    saveTask(newTask.value, descriptionInput.value, dueDateInput.value)
     newTask.value = ''
-
-    // Cuatrada maxima. No hacer esto en casa
-
-    setInterval(() => {
-      location.reload()
-    },3000)
+    descriptionInput.value = ''
+    dueDateInput.value = ''
+    descriptionInput.classList.add('hidden')
+    dueDateInput.classList.add('hidden')
+    newTaskLabel.classList.add('hidden')
+    descriptionLabel.classList.add('hidden')
+    dueDateLabel.classList.add('hidden')
   }
 })
 
-const saveTask = (task) => {
+const saveTask = (task, description, dueDate) => {
+  const randomPriority = Math.floor(Math.random() * 3) + 1 // Random priority between 1 and 3
+  const currentDate = new Date().toISOString() // Current date
+
   fetch('http://localhost:3002/tasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ title: task, content: 'prueba', userId: 1 })
+    body: JSON.stringify({ title: task, content: description, userId: 1, priority: randomPriority, createdAt: currentDate, dueDate: dueDate })
   })
 }
-
 
 fetch('http://localhost:3002/tasks')
   .then(response => response.json())
@@ -32,49 +47,46 @@ fetch('http://localhost:3002/tasks')
     const taskList = document.getElementById('taskList')
     const noTask = document.getElementById('noTask')
 
+    tasks.sort((a, b) => b.id - a.id)
+
     noTask.style.display = tasks.length === 0 ? 'block' : 'none'
 
-    console.log(tasks)
-
     tasks.forEach(task => {
-      const taskCover = document.createElement('a');
-      taskCover.classList.add('dark:bg-white', 'dark:bg-opacity-10', 'p-4', 'rounded-3xl', 'cursor-pointer', 'overflow-hidden', 'sm:hover:bg-opacity-10', 'dark:md:hover:bg-opacity-20', 'transition', 'duration-500', 'ease-in-out');
-      taskCover.href = '';
+      const taskCover = document.createElement('div')
+      taskCover.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-700', 'transition', 'duration-300', 'ease-in-out')
 
       const article = document.createElement('article')
-      article.classList.add('md:items-center', 'space-x-4')
-
-      const roundDiv = document.createElement('div')
-      roundDiv.classList.add('round')
+      article.classList.add('flex', 'items-center')
 
       const infoDiv = document.createElement('div')
-      infoDiv.classList.add('p-2', 'items-center')
+      infoDiv.classList.add('flex-1', 'ml-4')
 
       const title = document.createElement('h1')
-      title.classList.add('text-2xl')
+      title.classList.add('text-xl', 'font-semibold')
       title.textContent = task.title
 
-      const content = document.createElement('h2')
-      content.classList.add('text-gray-400')
+      const content = document.createElement('p')
+      content.classList.add('text-gray-400', 'text-sm', 'mt-1')
       content.textContent = task.content
 
-      infoDiv.id = task.id
-
+      const priorityBadge = document.createElement('span')
+      priorityBadge.classList.add('bg-blue-500', 'text-white', 'text-xs', 'px-2', 'py-1', 'rounded-full', 'font-semibold', 'ml-auto')
+      priorityBadge.textContent = `Priority: ${task.priority}`
 
       infoDiv.appendChild(title)
       infoDiv.appendChild(content)
-      article.appendChild(roundDiv)
       article.appendChild(infoDiv)
+      article.appendChild(priorityBadge)
       taskCover.appendChild(article)
       taskList.appendChild(taskCover)
 
-      infoDiv.addEventListener('click', () => {
+      taskCover.addEventListener('click', () => {
         removeTask(task.id)
       })
 
     })
   })
-  .catch(error => console.error('Error al obtener las tareas:', error))
+  .catch(error => console.error('Error fetching tasks:', error))
 
 const removeTask = (id) => {
   fetch(`http://localhost:3002/tasks/${id}`, {
@@ -88,13 +100,12 @@ const removeTask = (id) => {
   })
   .then(data => {
     if (data.error) {
-      throw new Error(data.error);
+      throw new Error(data.error)
     }
-    const taskCover = document.getElementById(`task-${id}`);
+    const taskCover = document.getElementById(`task-${id}`)
     if (taskCover) {
       taskCover.remove()
     }
   })
   .catch(error => console.error('Error deleting task:', error))
 }
-
