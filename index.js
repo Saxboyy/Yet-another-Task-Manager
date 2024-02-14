@@ -1,111 +1,203 @@
-const newTask = document.getElementById('newTask')
-const descriptionInput = document.getElementById('description')
-const dueDateInput = document.getElementById('dueDate')
-const newTaskLabel = document.getElementById('newTaskLabel')
-const descriptionLabel = document.getElementById('descriptionLabel')
-const dueDateLabel = document.getElementById('dueDateLabel')
+const newTask = document.getElementById("newTask")
+const descriptionInput = document.getElementById("description")
+const dueDateInput = document.getElementById("dueDate")
+const newTaskLabel = document.getElementById("newTaskLabel")
+const descriptionLabel = document.getElementById("descriptionLabel")
+const dueDateLabel = document.getElementById("dueDateLabel")
 
-newTask.addEventListener('click', () => {
-  descriptionInput.classList.remove('hidden')
-  dueDateInput.classList.remove('hidden')
-  newTaskLabel.classList.remove('hidden')
-  descriptionLabel.classList.remove('hidden')
-  dueDateLabel.classList.remove('hidden')
+newTask.addEventListener("click", showLabelsAndInputs)
+
+const inputIds = ["newTask", "description", "dueDate"]
+
+inputIds.forEach((id) => {
+  const input = document.getElementById(id)
+
+  input.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      saveTask(newTask.value, descriptionInput.value, dueDateInput.value)
+      clearInputs()
+      hideLabelsAndInputs()
+    }
+  })
 })
 
-newTask.addEventListener('keypress', (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault()
-    saveTask(newTask.value, descriptionInput.value, dueDateInput.value)
-    newTask.value = ''
-    descriptionInput.value = ''
-    dueDateInput.value = ''
-    descriptionInput.classList.add('hidden')
-    dueDateInput.classList.add('hidden')
-    newTaskLabel.classList.add('hidden')
-    descriptionLabel.classList.add('hidden')
-    dueDateLabel.classList.add('hidden')
+// function StatusCheck() {
+//   !fetchAndRenderTasks
+//     ? (StatusTask.innerHTML = "Desconectads")
+//     : (StatusTask.innerHTML = "Conectado")
+// }
+
+// Hay muchas formas de llevar esto acabo. Esta probablemente sea la mas cutre de todas.
+
+// TODO: Refactorizar esto
+
+function showLabelsAndInputs() {
+  descriptionInput.classList.remove("hidden")
+  dueDateInput.classList.remove("hidden")
+  newTaskLabel.classList.remove("hidden")
+  descriptionLabel.classList.remove("hidden")
+  dueDateLabel.classList.remove("hidden")
+}
+
+function hideLabelsAndInputs() {
+  descriptionInput.classList.add("hidden")
+  dueDateInput.classList.add("hidden")
+  newTaskLabel.classList.add("hidden")
+  descriptionLabel.classList.add("hidden")
+  dueDateLabel.classList.add("hidden")
+}
+
+function clearInputs() {
+  newTask.value = ""
+  descriptionInput.value = ""
+  dueDateInput.value = ""
+}
+
+function createTaskElement(task) {
+  const taskCover = document.createElement("div")
+  const priorityBadge = document.createElement("span")
+
+  priorityBadge.classList.add(
+    "bg-blue-500",
+    "text-white",
+    "text-xs",
+    "px-2",
+    "py-1",
+    "rounded-full",
+    "font-semibold",
+    "ml-auto"
+  )
+
+  if (task.done) {
+    taskCover.classList.add(
+      "bg-gray-700",
+      "p-4",
+      "rounded-lg",
+      "cursor-pointer",
+      "hover:bg-gray-700",
+      "transition",
+      "duration-300",
+      "ease-in-out"
+    )
+    priorityBadge.textContent = `Completada`
+  } else {
+    taskCover.classList.add(
+      "bg-gray-800",
+      "p-4",
+      "rounded-lg",
+      "cursor-pointer",
+      "hover:bg-gray-700",
+      "transition",
+      "duration-300",
+      "ease-in-out"
+    )
+    priorityBadge.textContent = `Priority: ${task.priority}`
   }
-})
 
-const saveTask = (task, description, dueDate) => {
-  const randomPriority = Math.floor(Math.random() * 3) + 1 // Random priority between 1 and 3
-  const currentDate = new Date().toISOString() // Current date
+  const article = document.createElement("article")
+  article.classList.add("flex", "items-center")
+  const infoDiv = document.createElement("div")
+  infoDiv.classList.add("flex-1", "ml-4")
+  const title = document.createElement("h1")
+  title.classList.add("text-xl", "font-semibold")
+  title.textContent = task.title
+  const content = document.createElement("p")
+  content.classList.add("text-gray-400", "text-sm", "mt-1")
+  content.textContent = task.content
 
-  fetch('http://localhost:3002/tasks', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ title: task, content: description, userId: 1, priority: randomPriority, createdAt: currentDate, dueDate: dueDate })
+  infoDiv.appendChild(title)
+  infoDiv.appendChild(content)
+  article.appendChild(infoDiv)
+  article.appendChild(priorityBadge)
+  taskCover.appendChild(article)
+
+  taskCover.addEventListener("click", () => doneTask(task.id, task.done))
+
+  return taskCover
+}
+
+function renderTaskList(tasks) {
+  const taskList = document.getElementById("taskList")
+  const noTask = document.getElementById("noTask")
+
+  tasks.sort((a, b) => b.id - a.id) && tasks.sort((a, b) => a.done - b.done)
+
+  noTask.style.display = tasks.length === 0 ? "block" : "none"
+
+  tasks.forEach((task) => {
+    const taskElement = createTaskElement(task)
+    taskList.appendChild(taskElement)
   })
 }
 
-fetch('http://localhost:3002/tasks')
-  .then(response => response.json())
-  .then(tasks => {
-    const taskList = document.getElementById('taskList')
-    const noTask = document.getElementById('noTask')
-
-    tasks.sort((a, b) => b.id - a.id)
-
-    noTask.style.display = tasks.length === 0 ? 'block' : 'none'
-
-    tasks.forEach(task => {
-      const taskCover = document.createElement('div')
-      taskCover.classList.add('bg-gray-800', 'p-4', 'rounded-lg', 'cursor-pointer', 'hover:bg-gray-700', 'transition', 'duration-300', 'ease-in-out')
-
-      const article = document.createElement('article')
-      article.classList.add('flex', 'items-center')
-
-      const infoDiv = document.createElement('div')
-      infoDiv.classList.add('flex-1', 'ml-4')
-
-      const title = document.createElement('h1')
-      title.classList.add('text-xl', 'font-semibold')
-      title.textContent = task.title
-
-      const content = document.createElement('p')
-      content.classList.add('text-gray-400', 'text-sm', 'mt-1')
-      content.textContent = task.content
-
-      const priorityBadge = document.createElement('span')
-      priorityBadge.classList.add('bg-blue-500', 'text-white', 'text-xs', 'px-2', 'py-1', 'rounded-full', 'font-semibold', 'ml-auto')
-      priorityBadge.textContent = `Priority: ${task.priority}`
-
-      infoDiv.appendChild(title)
-      infoDiv.appendChild(content)
-      article.appendChild(infoDiv)
-      article.appendChild(priorityBadge)
-      taskCover.appendChild(article)
-      taskList.appendChild(taskCover)
-
-      taskCover.addEventListener('click', () => {
-        removeTask(task.id)
-      })
-
-    })
-  })
-  .catch(error => console.error('Error fetching tasks:', error))
+function fetchAndRenderTasks() {
+  fetch("http://localhost:3002/tasks")
+    .then((response) => response.json())
+    .then((tasks) => renderTaskList(tasks))
+    .catch((error) => console.error("Error fetching tasks:", error))
+}
 
 const removeTask = (id) => {
   fetch(`http://localhost:3002/tasks/${id}`, {
-    method: 'DELETE'
+    method: "DELETE",
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok')
-    }
-    return response.json()
-  })
-  .then(data => {
-    if (data.error) {
-      throw new Error(data.error)
-    }
-    const taskCover = document.getElementById(`task-${id}`)
-    if (taskCover) {
-      taskCover.remove()
-    }
-  })
-  .catch(error => console.error('Error deleting task:', error))
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+      return response.json()
+    })
+    .then((data) => {
+      if (data.error) {
+        throw new Error(data.error)
+      }
+      const taskCover = document.getElementById(`task-${id}`)
+      if (taskCover) {
+        taskCover.remove()
+      }
+    })
+    .catch((error) => console.error("Error deleting task:", error))
 }
+
+const saveTask = (task, description, dueDate) => {
+  const randomPriority = Math.floor(Math.random() * 3) + 1
+  const currentDate = new Date().toISOString()
+
+  fetch("http://localhost:3002/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: task,
+      content: description,
+      userId: 1,
+      priority: randomPriority,
+      createdAt: currentDate,
+      dueDate: dueDate,
+    }),
+  })
+}
+
+const doneTask = (id, currentStatus) => {
+  const newStatus = !currentStatus
+
+  fetch(`http://localhost:3002/tasks/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ done: newStatus }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+      // Cuatrada maxima otra vez xd.
+      location.reload()
+    })
+    .catch((error) => console.error("Error toggling task status:", error))
+}
+
+fetchAndRenderTasks()

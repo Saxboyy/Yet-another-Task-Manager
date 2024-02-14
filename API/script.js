@@ -1,114 +1,123 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import {PrismaClient} from '@prisma/client';
-import cors from 'cors';
+import express from "express"
+import bodyParser from "body-parser"
+import { PrismaClient } from "@prisma/client"
+import cors from "cors"
 
-const app = express();
-const port = process.env.PORT || 3002;
+const app = express()
+const port = process.env.PORT || 3002
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors())
+app.use(bodyParser.json())
 
 // TODO: Separar en archivos. Por favor. POR FAVOR.
 
 // Routes
 
 // GET all users
-app.get('/users', async (req, res) => {
+app.get("/users", async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
-    res.json(users);
+    const users = await prisma.user.findMany()
+    res.json(users)
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching users');
+    res.status(500).send("Error fetching users")
   }
-});
+})
 
 // GET a user by ID
-app.get('/users/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
+app.get("/users/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10)
   try {
     const user = await prisma.user.findUnique({
-      where: {id},
-      include: {tasks: true},
-    });
+      where: { id },
+      include: { tasks: true },
+    })
     if (!user) {
-      res.status(404).send('User not found');
+      res.status(404).send("User not found")
     } else {
-      res.json(user);
+      res.json(user)
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching user');
+    res.status(500).send("Error fetching user")
   }
-});
+})
 
 // POST a new user
-app.post('/users', async (req, res) => {
-  const {name} = req.body;
+app.post("/users", async (req, res) => {
+  const { name } = req.body
   try {
     const user = await prisma.user.create({
-      data: {name},
-    });
-    res.json(user);
+      data: { name },
+    })
+    res.json(user)
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error creating user');
+    res.status(500).send("Error creating user")
   }
-});
+})
 
 // GET all tasks
-app.get('/tasks', async (req, res) => {
+app.get("/tasks", async (req, res) => {
   try {
-    const tasks = await prisma.task.findMany();
-    res.json(tasks);
+    const tasks = await prisma.task.findMany()
+    res.json(tasks)
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching tasks');
+    res.status(500).send("Error fetching tasks")
   }
-});
+})
 
 // GET a task by ID
-app.get('/tasks/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
+app.get("/tasks/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10)
   try {
     const task = await prisma.task.findUnique({
-      where: {id},
-    });
+      where: { id },
+    })
     if (!task) {
-      res.status(404).send('Task not found');
+      res.status(404).send("Task not found")
     } else {
-      res.json(task);
+      res.json(task)
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching task');
+    res.status(500).send("Error fetching task")
   }
-});
+})
 
 // DELETE a task by ID
-app.delete('/tasks/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
+app.delete("/tasks/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10)
   try {
     const deletedTask = await prisma.task.delete({
-      where: {id},
-    });
+      where: { id },
+    })
     if (!deletedTask) {
-      return res.status(404).json({error: 'Task not found'});
+      res.status(404).json({ error: "Task not found" })
     }
-    res.json({message: 'Task deleted successfully', task: deletedTask});
+    res.json({ message: "Task deleted successfully", task: deletedTask })
   } catch (error) {
-    console.error('Error deleting task:', error);
-    res.status(500).json({error: 'Error deleting task'});
+    res.status(500).json({ error: "Error deleting task" })
   }
-});
+})
 
+// PATCH Task
+
+app.put("/tasks/:id", async (req, res) => {
+  const id = parseInt(req.params.id, 10)
+  const { done } = req.body
+  try {
+    const updatedTask = await prisma.task.update({
+      where: { id },
+      data: { done },
+    })
+    res.json(updatedTask)
+  } catch (error) {
+    res.status(500).send("Error updating task")
+  }
+})
 
 // POST a new task
-app.post('/tasks', async (req, res) => {
-  const {userId, title, content, done} = req.body;
+app.post("/tasks", async (req, res) => {
+  const { userId, title, content, done } = req.body
   try {
     const task = await prisma.task.create({
       data: {
@@ -117,35 +126,13 @@ app.post('/tasks', async (req, res) => {
         content,
         done,
       },
-    });
-    res.json(task);
+    })
+    res.json(task)
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error editing task');
+    res.status(500).send("Error editing task")
   }
-});
-
-
-// // POST a new task
-// app.post('/tasks', async (req, res) => {
-//   const {id} = req.body;
-//   try {
-//     const updateUser = await prisma.user.update({
-//       where: {
-//         id: id,
-//       },
-//       data: {
-//         name: 'Viola the Magnificent',
-//       },
-//     });
-//     res.json(task);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Error creating task');
-//   }
-// });
+})
 
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
-
+  console.debug(`Server listening on port ${port}`)
+})
