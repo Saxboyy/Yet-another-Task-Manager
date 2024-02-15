@@ -57,8 +57,10 @@ function clearInputs() {
 function createTaskElement(task) {
   const taskCover = document.createElement("div")
   const priorityBadge = document.createElement("span")
+  const doneList = document.getElementById("doneList")
 
   priorityBadge.classList.add(
+    "animate-pulse",
     "bg-blue-500",
     "text-white",
     "text-xs",
@@ -66,8 +68,12 @@ function createTaskElement(task) {
     "py-1",
     "rounded-full",
     "font-semibold",
-    "ml-auto"
+    "ml-auto",
+    "invisible",
+    "sm:visible"
   )
+
+  // Move done task to doneTasks section
 
   if (task.done) {
     taskCover.classList.add(
@@ -80,7 +86,7 @@ function createTaskElement(task) {
       "duration-300",
       "ease-in-out"
     )
-    priorityBadge.textContent = `Completada`
+    priorityBadge.textContent = `Done`
   } else {
     taskCover.classList.add(
       "bg-gray-800",
@@ -98,7 +104,7 @@ function createTaskElement(task) {
   const article = document.createElement("article")
   article.classList.add("flex", "items-center")
   const infoDiv = document.createElement("div")
-  infoDiv.classList.add("flex-1", "ml-4")
+  infoDiv.classList.add("flex-1", "ml-4", "cursos-none")
   const title = document.createElement("h1")
   title.classList.add("text-xl", "font-semibold")
   title.textContent = task.title
@@ -106,11 +112,30 @@ function createTaskElement(task) {
   content.classList.add("text-gray-400", "text-sm", "mt-1")
   content.textContent = task.content
 
+  const deleteButton = document.createElement("button")
+  deleteButton.classList.add(
+    "bg-red-700",
+    "text-white",
+    "text-xs",
+    "px-2",
+    "py-1",
+    "rounded-full",
+    "font-semibold",
+    "ml-auto"
+  )
+
+  deleteButton.innerHTML =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>'
+
+  deleteButton.addEventListener("click", () => removeTask(task.id))
+  article.appendChild(deleteButton)
+
   infoDiv.appendChild(title)
   infoDiv.appendChild(content)
   article.appendChild(infoDiv)
   article.appendChild(priorityBadge)
   taskCover.appendChild(article)
+  doneList.appendChild(taskCover)
 
   taskCover.addEventListener("click", () => doneTask(task.id, task.done))
 
