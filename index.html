@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="recursos/style.css">
+    <link rel="stylesheet" href="assets/stykes/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Yet another task manager</title>
@@ -12,19 +12,22 @@
   <body class="bg-gray-900 text-white">
 
     <nav class="bg-gray-800 p-4">
-      <a href="#" class="flex items-center text-xl font-bold">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          class="w-8 h-8 mr-2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-        </svg>
-        <span>Task-To-Do</span>
-        <p class="ml-auto" id="Status"></p>
-      </a>
+      <div class="flex items-center text-xl font-bol">
+        <p>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            class="w-8 h-8 mr-2 inline-block">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+          </svg>
+          <a href="">YET Task </a>
+
+
+        <p class="ml-auto font-light animate-pulse" id="statusAPI"></p>
+      </div>
     </nav>
 
-    <div class="max-w-3xl mx-auto px-4 py-8">
-      <h1 class="text-4xl font-bold mb-8">Empower Yourself, Impact the World</h1>
+    <div class="max-w-3xl mx-auto px-4 py-">
+      <h1 class="text-4xl font-bold mb-8 mt-12">Empower Yourself, Impact the World</h1>
 
       <div class="pb-4">
         <label for="newTask" id="newTaskLabel" class="hidden">New Task</label>
@@ -36,22 +39,24 @@
         <label for="dueDate" id="dueDateLabel" class="hidden">Due Date</label>
         <input id="dueDate" type="date"
           class="w-full px-4 py-3 mt-4 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
+        <button id="btnSubmit"
+          class="hidden w-full px-4 py-3 mt-4 bg-blue-600 text-white rounded-lg shadow-md focus:outline-none hover:bg-blue-500"
+          onclick="saveTask(newTask.value, descriptionInput.value, dueDateInput.value)">Add
+          Task</button>
       </div>
 
       <h1 id="noTask" class="text-center text-2xl p-12 font-semibold">Nothing to do at the moment...</h1>
 
       <div id="taskList" class="grid gap-4"></div>
+      <div id="doneList" class="grid gap-4"></div>
 
-      <div id="doneTasks" class="0 h-12 font-semibold">
-        <h3>Tasks completed</h3>
-        <div id="doneList" class="grid gap-4"></div>
-
-      </div>
+    </div>
     </div>
 
-    <footer class="text-center py-5 bg-gray-800 mt-8">
+    <!-- <footer
+      class="text-center py-5 bg-gray-800 mt-8 w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
       <p>Made by <a href="https://github.com/Saxboyy" target="_blank" class="text-blue-500">Saxboyy</a></p>
-    </footer>
+    </footer> -->
 
     <script src="index.js" defer></script>
   </body>
