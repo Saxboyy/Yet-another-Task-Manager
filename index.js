@@ -12,6 +12,12 @@ const svgDisconnected =
 const api_URL = "http://localhost:3002/"
 let status
 
+const priority = {
+  1: "Low",
+  2: "Medium",
+  3: "High",
+}
+
 newTask.addEventListener("click", showLabelsAndInputs)
 
 const inputIds = ["newTask", "description", "dueDate"]
@@ -48,9 +54,11 @@ function showLabelsAndInputs() {
     [
       descriptionInput,
       dueDateInput,
+      priorityInput,
       newTaskLabel,
       descriptionLabel,
       dueDateLabel,
+      priorityLabel,
       btnSubmit,
     ],
     "show"
@@ -65,6 +73,7 @@ function hideLabelsAndInputs() {
       newTaskLabel,
       descriptionLabel,
       dueDateLabel,
+      priorityLabel,
       btnSubmit,
     ],
     "hide"
@@ -78,12 +87,20 @@ function clearInputs() {
 }
 
 function createTaskElement(task) {
+  const taskAll = document.createElement("div")
   const taskCover = document.createElement("div")
   const priorityBadge = document.createElement("span")
   // const doneList = document.getElementById("doneList")
 
+  taskAll.classList.add(
+    "flex",
+    "flex-col",
+    "sm:flex-row",
+    "items-center",
+    "bg-red-200"
+  )
+
   priorityBadge.classList.add(
-    "animate-pulse",
     "bg-blue-500",
     "text-white",
     "text-xs",
@@ -119,7 +136,9 @@ function createTaskElement(task) {
       "duration-300",
       "ease-in-out"
     )
-    priorityBadge.textContent = `Priority: ${task.priority}`
+    // TODO: cambiar
+
+    priorityBadge.textContent = `${priority[1]}`
   }
 
   const article = document.createElement("article")
@@ -146,7 +165,8 @@ function createTaskElement(task) {
     "py-1",
     "rounded-full",
     "font-semibold",
-    "ml-auto"
+    "ml-auto",
+    "hidden"
   )
 
   // TODO: Cambiar logica. Solo aparece cuando se le hace hover.
@@ -155,8 +175,8 @@ function createTaskElement(task) {
     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>'
 
   deleteButton.addEventListener("click", () => removeTask(task.id))
-  article.appendChild(deleteButton)
-
+  taskAll.appendChild(taskCover)
+  taskCover.appendChild(deleteButton)
   infoDiv.appendChild(title)
   infoDiv.appendChild(content)
   article.appendChild(infoDiv)
@@ -184,6 +204,7 @@ function renderTaskList(tasks) {
 
   tasks.forEach((task) => {
     const taskElement = createTaskElement(task)
+
     taskList.appendChild(taskElement)
   })
 }
@@ -194,6 +215,7 @@ async function fetchAndRenderTasks() {
   if (!response.ok) {
     return false
   }
+
   renderTaskList(await response.json())
   return true
 }
@@ -259,6 +281,7 @@ const doneTask = (id, currentStatus) => {
 }
 
 async function main() {
+  statusAPI.innerHTML = status ? svgConnected : svgDisconnected
   status = await fetchAndRenderTasks()
   statusAPI.innerHTML = status ? svgConnected : svgDisconnected
 }

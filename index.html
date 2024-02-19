@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="assets/stykes/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Yet another task manager</title>
   </head>
@@ -31,7 +31,7 @@
 
       <div class="pb-4 flex flex-col gap-4">
 
-        <label for="newTask" id="newTaskLabel" class="hidden">New Task</label>
+        <label for="newTask" id="newTaskLabel" class="hidden">Tittle</label>
         <input id="newTask" type="text" placeholder="Add a new task"
           class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none">
 
@@ -39,6 +39,15 @@
         <input id="description" type="text" placeholder="Add description"
           class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
 
+        <label for="priority" id="priorityLabel" class="hidden">Priority</label>
+        <select name="" id="priorityInput"
+          class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
+          >
+          <option value="1"">Low</option>
+          <option value=" 2">Medium</option>
+          <option value="3">High</option>
+
+        </select>
 
         <label for="dueDate" id="dueDateLabel" class="hidden">Due Date</label>
         <input id="dueDate" type="date"
@@ -50,9 +59,19 @@
           Task</button>
       </div>
 
-      <h1 id="noTask" class="text-center text-2xl p-12 font-semibold">Nothing to do at the moment...</h1>
+      <h1 id="noTask" class="text-center text-2xl p-12 font-semibold italic">Nothing to do at the moment...</h1>
 
-      <div id="taskList" class="grid gap-4"></div>
+      <div id="taskList" class="grid gap-4">
+        <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg cursor-pointer hover:bg-gray-700 transition duration-300 ease-in-out
+">
+          <article class="flex item-center">
+            <div class="flex-1 ml-4">
+              <h1 class="text-xl font-semibold">Esto es una prueba</h1>
+              <p class="mt-1">Prueba para movil</p>
+            </div>
+          </article>
+        </div>
+      </div>
       <div id="doneList" class="grid gap-4"></div>
 
     </div>
