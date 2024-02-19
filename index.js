@@ -70,6 +70,7 @@ function hideLabelsAndInputs() {
     [
       descriptionInput,
       dueDateInput,
+      priorityInput,
       newTaskLabel,
       descriptionLabel,
       dueDateLabel,
@@ -257,6 +258,8 @@ async function saveTask(task, description, dueDate) {
         dueDate: dueDate,
       }),
     })
+    clearInputs()
+    hideLabelsAndInputs()
   } catch (error) {
     console.error("Error:", error)
   }
