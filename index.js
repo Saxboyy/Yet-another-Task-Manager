@@ -4,6 +4,13 @@ const dueDateInput = document.getElementById("dueDate")
 const newTaskLabel = document.getElementById("newTaskLabel")
 const descriptionLabel = document.getElementById("descriptionLabel")
 const dueDateLabel = document.getElementById("dueDateLabel")
+const statusAPI = document.getElementById("statusAPI")
+const svgConnected =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="green" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-squircle"><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9-9-1.8-9-9 1.8-9 9-9"/></svg>'
+const svgDisconnected =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="red" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-squircle"><path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9-9-1.8-9-9 1.8-9 9-9"/></svg>'
+const api_URL = "http://localhost:3002/"
+let status
 
 newTask.addEventListener("click", showLabelsAndInputs)
 
@@ -13,7 +20,7 @@ inputIds.forEach((id) => {
   const input = document.getElementById(id)
 
   input.addEventListener("keypress", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && input.value !== "") {
       event.preventDefault()
       saveTask(newTask.value, descriptionInput.value, dueDateInput.value)
       clearInputs()
@@ -22,30 +29,46 @@ inputIds.forEach((id) => {
   })
 })
 
-// function StatusCheck() {
-//   !fetchAndRenderTasks
-//     ? (StatusTask.innerHTML = "Desconectads")
-//     : (StatusTask.innerHTML = "Conectado")
-// }
-
 // Hay muchas formas de llevar esto acabo. Esta probablemente sea la mas cutre de todas.
 
 // TODO: Refactorizar esto
 
+function toggleVisibility(elements, action) {
+  elements.forEach((element) => {
+    if (action === "show") {
+      element.classList.remove("hidden")
+    } else if (action === "hide") {
+      element.classList.add("hidden")
+    }
+  })
+}
+
 function showLabelsAndInputs() {
-  descriptionInput.classList.remove("hidden")
-  dueDateInput.classList.remove("hidden")
-  newTaskLabel.classList.remove("hidden")
-  descriptionLabel.classList.remove("hidden")
-  dueDateLabel.classList.remove("hidden")
+  toggleVisibility(
+    [
+      descriptionInput,
+      dueDateInput,
+      newTaskLabel,
+      descriptionLabel,
+      dueDateLabel,
+      btnSubmit,
+    ],
+    "show"
+  )
 }
 
 function hideLabelsAndInputs() {
-  descriptionInput.classList.add("hidden")
-  dueDateInput.classList.add("hidden")
-  newTaskLabel.classList.add("hidden")
-  descriptionLabel.classList.add("hidden")
-  dueDateLabel.classList.add("hidden")
+  toggleVisibility(
+    [
+      descriptionInput,
+      dueDateInput,
+      newTaskLabel,
+      descriptionLabel,
+      dueDateLabel,
+      btnSubmit,
+    ],
+    "hide"
+  )
 }
 
 function clearInputs() {
@@ -57,7 +80,7 @@ function clearInputs() {
 function createTaskElement(task) {
   const taskCover = document.createElement("div")
   const priorityBadge = document.createElement("span")
-  const doneList = document.getElementById("doneList")
+  // const doneList = document.getElementById("doneList")
 
   priorityBadge.classList.add(
     "animate-pulse",
@@ -72,8 +95,6 @@ function createTaskElement(task) {
     "invisible",
     "sm:visible"
   )
-
-  // Move done task to doneTasks section
 
   if (task.done) {
     taskCover.classList.add(
@@ -115,6 +136,10 @@ function createTaskElement(task) {
   const deleteButton = document.createElement("button")
   deleteButton.classList.add(
     "bg-red-700",
+
+    "hover:bg-red-600",
+    "transition",
+    "duration-300",
     "text-white",
     "text-xs",
     "px-2",
@@ -123,6 +148,8 @@ function createTaskElement(task) {
     "font-semibold",
     "ml-auto"
   )
+
+  // TODO: Cambiar logica. Solo aparece cuando se le hace hover.
 
   deleteButton.innerHTML =
     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>'
@@ -137,7 +164,12 @@ function createTaskElement(task) {
   taskCover.appendChild(article)
   doneList.appendChild(taskCover)
 
-  taskCover.addEventListener("click", () => doneTask(task.id, task.done))
+  taskCover.addEventListener("click", () => {
+    taskCover.classList.toggle(task.done ? "bg-gray-700" : "bg-gray-800")
+    taskCover.classList.toggle(task.done ? "bg-gray-800" : "bg-gray-700")
+    doneTask(task.id, task.done)
+    infoDiv.appendChild(taskCover)
+  })
 
   return taskCover
 }
@@ -156,59 +188,62 @@ function renderTaskList(tasks) {
   })
 }
 
-function fetchAndRenderTasks() {
-  fetch("http://localhost:3002/tasks")
-    .then((response) => response.json())
-    .then((tasks) => renderTaskList(tasks))
-    .catch((error) => console.error("Error fetching tasks:", error))
+async function fetchAndRenderTasks() {
+  const response = await fetch(api_URL + "tasks")
+
+  if (!response.ok) {
+    return false
+  }
+  renderTaskList(await response.json())
+  return true
 }
 
-const removeTask = (id) => {
-  fetch(`http://localhost:3002/tasks/${id}`, {
+async function removeTask(id) {
+  const response = await fetch(api_URL + "tasks/" + id, {
     method: "DELETE",
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
-      }
-      return response.json()
-    })
-    .then((data) => {
-      if (data.error) {
-        throw new Error(data.error)
-      }
-      const taskCover = document.getElementById(`task-${id}`)
-      if (taskCover) {
-        taskCover.remove()
-      }
-    })
-    .catch((error) => console.error("Error deleting task:", error))
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok")
+  }
+
+  const data = await response.json()
+
+  if (data) {
+    const taskCover = document.getElementById(`task-${id}`)
+    taskCover?.remove()
+    location.reload()
+  }
 }
 
-const saveTask = (task, description, dueDate) => {
+async function saveTask(task, description, dueDate) {
   const randomPriority = Math.floor(Math.random() * 3) + 1
   const currentDate = new Date().toISOString()
 
-  fetch("http://localhost:3002/tasks", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title: task,
-      content: description,
-      userId: 1,
-      priority: randomPriority,
-      createdAt: currentDate,
-      dueDate: dueDate,
-    }),
-  })
+  try {
+    const response = await fetch(api_URL + "tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: task,
+        content: description,
+        userId: 1,
+        priority: randomPriority,
+        createdAt: currentDate,
+        dueDate: dueDate,
+      }),
+    })
+  } catch (error) {
+    console.error("Error:", error)
+  }
 }
 
 const doneTask = (id, currentStatus) => {
   const newStatus = !currentStatus
 
-  fetch(`http://localhost:3002/tasks/${id}`, {
+  fetch("http://localhost:3002/tasks/" + id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -219,10 +254,13 @@ const doneTask = (id, currentStatus) => {
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
-      // Cuatrada maxima otra vez xd.
-      location.reload()
     })
     .catch((error) => console.error("Error toggling task status:", error))
 }
 
-fetchAndRenderTasks()
+async function main() {
+  status = await fetchAndRenderTasks()
+  statusAPI.innerHTML = status ? svgConnected : svgDisconnected
+}
+
+main()

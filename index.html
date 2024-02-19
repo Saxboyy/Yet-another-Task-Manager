@@ -29,16 +29,21 @@
     <div class="max-w-3xl mx-auto px-4 py-">
       <h1 class="text-4xl font-bold mb-8 mt-12">Empower Yourself, Impact the World</h1>
 
-      <div class="pb-4">
+      <div class="pb-4 flex flex-col gap-4">
+
         <label for="newTask" id="newTaskLabel" class="hidden">New Task</label>
         <input id="newTask" type="text" placeholder="Add a new task"
           class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none">
+
         <label for="description" id="descriptionLabel" class="hidden">Description</label>
         <input id="description" type="text" placeholder="Add description"
-          class="w-full px-4 py-3 mt-4 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
+          class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
+
+
         <label for="dueDate" id="dueDateLabel" class="hidden">Due Date</label>
         <input id="dueDate" type="date"
-          class="w-full px-4 py-3 mt-4 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
+          class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none hidden">
+
         <button id="btnSubmit"
           class="hidden w-full px-4 py-3 mt-4 bg-blue-600 text-white rounded-lg shadow-md focus:outline-none hover:bg-blue-500"
           onclick="saveTask(newTask.value, descriptionInput.value, dueDateInput.value)">Add
